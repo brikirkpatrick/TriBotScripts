@@ -18,7 +18,7 @@ import java.awt.*;
 
 @ScriptManifest(authors = {"Brik94"}, category = "Money", name = "FlaxSpinner")
 public class FlaxSpinner extends Script implements Painting{
-
+//Test
     Timer time = new Timer(3000); //3 seconds. Time it rests until another condiiton is T/F. Dynamic Sleeping.
     private final RSTile BANK_TILE = new RSTile(3208, 3220, 2),
                          BANK_STAIRS = new RSTile(3205, 3209, 2),
