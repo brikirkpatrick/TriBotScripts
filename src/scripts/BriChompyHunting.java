@@ -16,6 +16,7 @@ import java.awt.*;
 import org.tribot.api2007.types.RSTile;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
+import org.tribot.script.interfaces.MessageListening07;
 import org.tribot.script.interfaces.Painting;
 
 import static org.tribot.api2007.Walking.clickTileMS;
@@ -31,7 +32,7 @@ import static org.tribot.api2007.Walking.clickTileMS;
 
 @ScriptManifest(authors = {"Brik94"}, category = "Quests", name = "BriChompyHunting",
         description = "Chompy hunting using an efficient method.")
-public class BriChompyHunting extends Script implements Painting {
+public class BriChompyHunting extends Script implements Painting, MessageListening07 {
 
     //Note: need to add all Bow ID's.
     private final int EMPTY_BELLOWS_ID = 2871, FULL_BELLOWS_ID = 2872, COMP_OGREBOW_ID = 4827,
@@ -76,17 +77,16 @@ public class BriChompyHunting extends Script implements Painting {
     @Override
     public void run() {
         killedChompies = 0;
-
         //noinspection InfiniteLoopStatement
         while(true) {
             sleep(50);
             SCRIPT_STATE = getState();
 
+
             switch(SCRIPT_STATE){
 
                 case KILLING_CHOMPY:
                     killChompy();
-                    killedChompies++;
                     break;
                 case FILLING_BELLOWS:
                     fillBellows();
@@ -124,32 +124,22 @@ public class BriChompyHunting extends Script implements Painting {
     }
 
     private void catchToad(){
-        //if (minFullBellow()){
             RSItem[] goodBellows = Inventory.find(USUSABLE_BELLOW_ID);
             RSNPC[] toad = NPCs.findNearest(10, TOAD_ID);
 
             goodBellows[0].click("Use");
             DynamicClicking.clickRSNPC(toad[0], 1);
             waitUntilIdle();
-        //}
     }
 
     private void placeToad(){
         RSItem[] bloatedToad = Inventory.find(INV_TOAD_ID);
-        RSTile thisone = new RSTile(2337, 3061); //BAD temporary fix.
-
-        if(checkGroundForToad()){ //standing on a toad. Click a random tile with no toad close by.
-            clickTileMS(thisone, 1);
             bloatedToad[0].click("Drop");
-        }else {
-            bloatedToad[0].click("Drop");
-        }
     }
 
     private boolean checkForChompy(){
         RSNPC[] chompy = NPCs.findNearest(ALIVE_CHOMY_ID);
         if(chompy.length > 0 && chompy[0].getID()!= 1476){
-            //chompy[0].getPosition();
             println("Chompy in sight yes");
             return true;
         }
@@ -175,6 +165,7 @@ public class BriChompyHunting extends Script implements Painting {
         }
     }
 
+    //deprecated
     private boolean checkGroundForToad() {
         RSObject[] groundToad = Objects.findNearest(5, BLOATED_TOAD_ID);
         if (groundToad.length > 0){
@@ -194,7 +185,50 @@ public class BriChompyHunting extends Script implements Painting {
             println("going for kill");
             first_chompy[0].click("Attack");
             waitUntilIdle();
-            killChompy();
+            killChompy(); //Recursion
+
         }
     }
+
+
+    @Override
+    public void serverMessageReceived(String s) {
+        sleep(300, 1000);
+        if (s.contains("You scratch a notch on your bow for the chompy bird kill.")) {
+            println("Server message worked. Chompy killed.");
+            killedChompies++;
+        }
+        if(s.contains("There is a bloated toad already placed at this location.")){
+            //Move to another tile.
+            RSTile thisOne = new RSTile(2337, 3061); //BAD temporary fix. Move to a random tile with no bloated toad.
+            clickTileMS(thisOne, 1);
+        }
+    }
+
+    @Override
+    public void clanMessageReceived(String s, String s1) {
+
+    }
+
+    @Override
+    public void playerMessageReceived(String s, String s1) {
+
+    }
+
+    @Override
+    public void tradeRequestReceived(String s) {
+
+    }
+
+    @Override
+    public void duelRequestReceived(String s, String s1) {
+
+    }
+
+    @Override
+    public void personalMessageReceived(String s, String s1) {
+
+    }
+
+
 }
