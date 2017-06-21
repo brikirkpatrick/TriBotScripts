@@ -3,7 +3,7 @@ package scripts;
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
-import org.tribot.api.rs3.Player;
+import org.tribot.api2007.Player;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.NPCs;
 import org.tribot.api2007.Objects;
@@ -12,10 +12,21 @@ import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSObject;
 
 import java.awt.*;
+
+import org.tribot.api2007.types.RSTile;
 import org.tribot.script.Script;
 import org.tribot.script.ScriptManifest;
 import org.tribot.script.interfaces.Painting;
 
+import static org.tribot.api2007.Walking.clickTileMS;
+
+/**
+ * Fix 1: Need to add total number of bellows in players inventory at the beginning.
+ * Fix getState 2nd else if statement to include this.
+ * Fix 2: Check for correct chompy hunting gear at beginning
+ * Fix 3: Placing new toad where bloated toad already exists
+ * https://tribot.org/forums/topic/30185-trilezs-scripting-tutorial/
+ */
 
 
 @ScriptManifest(authors = {"Brik94"}, category = "Quests", name = "BriChompyHunting",
@@ -45,12 +56,13 @@ public class BriChompyHunting extends Script implements Painting {
 
     private State getState(){
         if (checkForChompy()){ //chompy in sight
-            if(howManyBellows() < 1){
+            if(numEmptyBellows() == 24){
+                println("Less than 1 bellows");
                 return State.FILLING_BELLOWS;
             }else {
                 return State.KILLING_CHOMPY;
             }
-        }else if(howManyBellows() > 0) {//we have atleast 1 useable bellow
+        }else if(numEmptyBellows() != 24) {//there is atleast 1 useable bellow
             if (Inventory.getCount(INV_TOAD_ID) < 1) { //we have no toads
                 return State.CATCHING_TOAD;
             } else { //we do have toads
@@ -85,40 +97,19 @@ public class BriChompyHunting extends Script implements Painting {
                     placeToad();
                     break;
             }
+            sleep(40, 80);
         }
 
     }
 
-    public boolean haveMinBellows(){
-        RSItem[] ebellows = Inventory.find(EMPTY_BELLOWS_ID);
-        RSItem[] fbellows = Inventory.find(FULL_BELLOWS_ID);
-
-        if ((ebellows != null && ebellows.length > 0) || (fbellows != null && fbellows.length > 0)){
-            println("Bellows in inventory");
-            return true;
-        }
-        return false;
-    } //might revisit
-
-    private int howManyBellows(){
+    private int numEmptyBellows(){
         return Inventory.getCount(EMPTY_BELLOWS_ID);
-    }
-
-    //Have atleast 1 usable bellow.
-    private boolean minFullBellow() {
-        RSItem[] fbellows = Inventory.find(FULL_BELLOWS_ID);
-        if (fbellows.length > 0) {
-            println("FULL Bellows in inventory");
-            return true;
-        }
-        return false;
-        //return fbellows != null && fbellows.length > 0;
     }
 
     private void fillBellows(){
 
         //if all bellows are empty, fill them up.
-        while (howManyBellows() != 0){ // returns false
+        while (numEmptyBellows() != 0){ // returns false
             if (Player.getAnimation() == -1) {
                 println("Player standing");
                 RSItem[] ebellows = Inventory.find(EMPTY_BELLOWS_ID);
@@ -132,19 +123,26 @@ public class BriChompyHunting extends Script implements Painting {
     }
 
     private void catchToad(){
-        if (minFullBellow()){
+        //if (minFullBellow()){
             RSItem[] goodBellows = Inventory.find(USUSABLE_BELLOW_ID);
             RSNPC[] toad = NPCs.findNearest(10, TOAD_ID);
 
             goodBellows[0].click("Use");
             DynamicClicking.clickRSNPC(toad[0], 1);
             waitUntilIdle();
-        }
+        //}
     }
 
     private void placeToad(){
         RSItem[] bloatedToad = Inventory.find(INV_TOAD_ID);
-        bloatedToad[0].click("Drop");
+        RSTile thisone = new RSTile(2335, 3060); //BAD temporary fix.
+
+        if(checkGroundForToad()){ //standing on a toad. Click a random tile with no toad close by.
+            clickTileMS(thisone, 1);
+            bloatedToad[0].click("Drop");
+        }else {
+            bloatedToad[0].click("Drop");
+        }
     }
 
     private boolean checkForChompy(){
@@ -155,7 +153,6 @@ public class BriChompyHunting extends Script implements Painting {
             return true;
         }
 
-        println("not clickable");
         return false;
     }
 
@@ -165,7 +162,7 @@ public class BriChompyHunting extends Script implements Painting {
         while(Timing.timeFromMark(t) < General.random(400, 800)){ //400, 800
             sleep(400, 800);
 
-            if(org.tribot.api2007.Player.isMoving() || org.tribot.api2007.Player.getRSPlayer().getAnimation() != -1){
+            if(Player.isMoving() || Player.getAnimation() != -1){
                 t = System.currentTimeMillis();
                 continue;
             }
@@ -175,6 +172,16 @@ public class BriChompyHunting extends Script implements Painting {
             if(Player.getAnimation() == -1)
                 break;
         }
+    }
+
+    private boolean checkGroundForToad(){
+        RSObject[] groundToad = Objects.findNearest(5, BLOATED_TOAD_ID);
+        if(Player.getPosition() == groundToad[0].getPosition()) {
+            println("Standing on Toad");
+            return true;
+        }
+        println("Not standing on toad");
+        return false;
     }
 
     private void killChompy(){
