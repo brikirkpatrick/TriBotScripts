@@ -79,6 +79,7 @@ public class BriChompyHunting extends Script implements Painting {
 
         //noinspection InfiniteLoopStatement
         while(true) {
+            sleep(50);
             SCRIPT_STATE = getState();
 
             switch(SCRIPT_STATE){
@@ -97,7 +98,7 @@ public class BriChompyHunting extends Script implements Painting {
                     placeToad();
                     break;
             }
-            sleep(40, 80);
+            //sleep(40, 80);
         }
 
     }
@@ -135,7 +136,7 @@ public class BriChompyHunting extends Script implements Painting {
 
     private void placeToad(){
         RSItem[] bloatedToad = Inventory.find(INV_TOAD_ID);
-        RSTile thisone = new RSTile(2335, 3060); //BAD temporary fix.
+        RSTile thisone = new RSTile(2337, 3061); //BAD temporary fix.
 
         if(checkGroundForToad()){ //standing on a toad. Click a random tile with no toad close by.
             clickTileMS(thisone, 1);
@@ -174,11 +175,13 @@ public class BriChompyHunting extends Script implements Painting {
         }
     }
 
-    private boolean checkGroundForToad(){
+    private boolean checkGroundForToad() {
         RSObject[] groundToad = Objects.findNearest(5, BLOATED_TOAD_ID);
-        if(Player.getPosition() == groundToad[0].getPosition()) {
-            println("Standing on Toad");
-            return true;
+        if (groundToad.length > 0){
+            if (Player.getPosition() == groundToad[0].getPosition()) {
+                println("Standing on Toad");
+                return true;
+            }
         }
         println("Not standing on toad");
         return false;
