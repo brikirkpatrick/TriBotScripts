@@ -97,7 +97,7 @@ public class BriChompyHunting extends Script implements Painting {
                     placeToad();
                     break;
             }
-            sleep(40, 80); //test
+            sleep(40, 80);
         }
 
     }
