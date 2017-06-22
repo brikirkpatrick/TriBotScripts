@@ -3,6 +3,7 @@ package scripts;
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
+import org.tribot.api.util.abc.ABCUtil;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.Inventory;
 import org.tribot.api2007.NPCs;
@@ -12,6 +13,7 @@ import org.tribot.api2007.types.RSNPC;
 import org.tribot.api2007.types.RSObject;
 
 import java.awt.*;
+import java.util.Random;
 
 import org.tribot.api2007.types.RSTile;
 import org.tribot.script.Script;
@@ -32,16 +34,17 @@ import static org.tribot.api2007.Walking.clickTileMS;
 
 @ScriptManifest(authors = {"Brik94"}, category = "Quests", name = "BriChompyHunting",
         description = "Chompy hunting using an efficient method.")
-public class BriChompyHunting extends Script implements Painting, MessageListening07 {
+public class BriChompyHunting extends Script implements Painting, MessageListening07{
 
-    //Note: need to add all Bow ID's.
-    private final int EMPTY_BELLOWS_ID = 2871, FULL_BELLOWS_ID = 2872, COMP_OGREBOW_ID = 4827,
-            OGRE_ARROW_ID = 2866, TOAD_ID = 1473, BLOATED_TOAD_ID= 1474, INV_TOAD_ID = 2875, ALIVE_CHOMY_ID = 1475,
-            DEAD_CHOMPY_ID = 1476, SWAMP_ID = 684;
+    private final int EMPTY_BELLOWS_ID = 2871, TOAD_ID = 1473, BLOATED_TOAD_ID= 1474, INV_TOAD_ID = 2875,
+                      ALIVE_CHOMY_ID = 1475, SWAMP_ID = 684;
+                        //OGRE_ARROW_ID = 2866, FULL_BELLOWS_ID = 2872,COMP_OGREBOW_ID = 4827, DEAD_CHOMPY_ID = 1476
     private final int[] USUSABLE_BELLOW_ID = {2872, 2873, 2874};
+    private RSTile[] tileList = {new RSTile(2334, 3055), new RSTile(2337, 3062), new RSTile(2335, 3058), new RSTile(2338, 3060), new RSTile(2331, 3059)};
     private int killedChompies;
     private State SCRIPT_STATE = getState();
-    //Timer time = new Timer(3000);
+    private Random rand;
+    private ABCUtil abc = new ABCUtil(); //AntiBanCompliance
 
     @Override
     public void onPaint(Graphics g) {
@@ -77,11 +80,11 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
     @Override
     public void run() {
         killedChompies = 0;
+        rand = new Random();
         //noinspection InfiniteLoopStatement
         while(true) {
             sleep(50);
             SCRIPT_STATE = getState();
-
 
             switch(SCRIPT_STATE){
 
@@ -100,7 +103,6 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
             }
             //sleep(40, 80);
         }
-
     }
 
     private int numEmptyBellows(){
@@ -119,7 +121,6 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
                 DynamicClicking.clickRSObject(bubbles[0], 1);
                 waitUntilIdle();
             }
-
         }
     }
 
@@ -134,7 +135,7 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
 
     private void placeToad(){
         RSItem[] bloatedToad = Inventory.find(INV_TOAD_ID);
-            bloatedToad[0].click("Drop");
+        bloatedToad[0].click("Drop");
     }
 
     private boolean checkForChompy(){
@@ -143,7 +144,6 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
             println("Chompy in sight yes");
             return true;
         }
-
         return false;
     }
 
@@ -191,7 +191,10 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
     }
 
 
+    //Methods that have to be generated from MessageListener07------------------------------------------------------
     @Override
+    //Increments killed chompies based on server message received.
+    //Also checks if standing on toad based on server message received.
     public void serverMessageReceived(String s) {
         sleep(300, 1000);
         if (s.contains("You scratch a notch on your bow for the chompy bird kill.")) {
@@ -200,8 +203,8 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
         }
         if(s.contains("There is a bloated toad already placed at this location.")){
             //Move to another tile.
-            RSTile thisOne = new RSTile(2337, 3061); //BAD temporary fix. Move to a random tile with no bloated toad.
-            clickTileMS(thisOne, 1);
+            RSTile randomTile = tileList[rand.nextInt(tileList.length)];
+            clickTileMS(randomTile, 1);
         }
     }
 
@@ -229,6 +232,6 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
     public void personalMessageReceived(String s, String s1) {
 
     }
-
+    //--------------------------------------------------------------------------------------------------------------
 
 }
