@@ -29,6 +29,7 @@ import static org.tribot.api2007.Walking.clickTileMS;
  * Fix 2: Check for correct chompy hunting gear at beginning
  * Fix 3: Placing new toad where bloated toad already exists
  * https://tribot.org/forums/topic/30185-trilezs-scripting-tutorial/
+ * https://pastebin.com/v0Y6vAdy     //ABC2 implement
  */
 
 
