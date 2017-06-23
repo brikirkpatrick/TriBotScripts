@@ -33,7 +33,7 @@ import static org.tribot.api2007.Walking.clickTileMS;
  */
 
 
-@ScriptManifest(authors = {"Brik94"}, category = "Quests", name = "BriChompyHunting",
+@ScriptManifest(authors = {"Brik94"}, category = "MiniGames", name = "PureChompyHunting",
         description = "Chompy hunting using an efficient method.")
 public class BriChompyHunting extends Script implements Painting, MessageListening07{
 
@@ -187,7 +187,6 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
             first_chompy[0].click("Attack");
             waitUntilIdle();
             killChompy(); //Recursion
-
         }
     }
 
