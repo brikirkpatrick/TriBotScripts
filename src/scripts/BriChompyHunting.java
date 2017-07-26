@@ -24,6 +24,7 @@ import static org.tribot.api2007.Walking.clickTileMS;
  * Fix 1: Need to add total number of bellows in players inventory at the beginning.
  * Fix getState 2nd else if statement to include this.
  * Fix 2: Check for correct chompy hunting gear at beginning
+ * Fix 3: Add run time + Chompy kills p/hr.
  * DONE 3: Placing new toad where bloated toad already exists
  * https://tribot.org/forums/topic/30185-trilezs-scripting-tutorial/
  * https://pastebin.com/v0Y6vAdy     //ABC2 implement
