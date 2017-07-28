@@ -3,6 +3,7 @@ package scripts;
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
 import org.tribot.api.Timing;
+import org.tribot.api.types.generic.Condition;
 import org.tribot.api.util.abc.ABCUtil;
 import org.tribot.api2007.*;
 import org.tribot.api2007.types.RSItem;
@@ -42,15 +43,21 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
     private int killedChompies;
     private State SCRIPT_STATE = getState();
     private ABCUtil abc_util = new ABCUtil(); //AntiBanCompliance
+    private final long START_TIME = System.currentTimeMillis();
 
     @Override
     public void onPaint(Graphics g) {
-
+        //CALCULATIONS
+        long timeRan = System.currentTimeMillis()-START_TIME;
+        double multiplier = timeRan / 3600000D;
+        int killsPerHr = (int) (killedChompies / multiplier);
         //https://tribot.org/forums/topic/7010-tutorialbrians-rookie-pro-scripting-tutorialtutorial/
         g.setColor(Color.WHITE);
         g.drawString("Pure's Chompy Killer", 10, 70);
-        g.drawString("Total chompies killed: " + killedChompies, 10, 90);
-        g.drawString("State: " + SCRIPT_STATE, 10, 110);
+        g.drawString("Running for: " + Timing.msToString(timeRan), 10, 90);
+        g.drawString("Total chompies killed: " + killedChompies, 10, 110);
+        g.drawString("Kills Per Hour: " + killsPerHr, 10, 130);
+        g.drawString("State: " + SCRIPT_STATE, 10, 150);
     }
 
     private enum State {
@@ -63,7 +70,7 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
                 println("Less than 1 bellows");
                 return State.FILLING_BELLOWS;
             }else {
-                Camera.setCameraAngle(General.random(40, 70));
+                //Camera.setCameraAngle(General.random(40, 70)); Prolly unnecessary.
                 return State.KILLING_CHOMPY;
             }
         }else if(numEmptyBellows() != 24) {//there is atleast 1 useable bellow
@@ -149,6 +156,14 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
                 DynamicClicking.clickRSObject(bubbles[0], 1);
                 waitUntilIdle();
             }
+
+//            Timing.waitCondition(new Condition() {
+//                @Override
+//                public boolean active() {
+//                    General.sleep(100);
+//                    return //boolean all bellows full?
+//                }
+//            })
         }
     }
 
