@@ -7,3 +7,8 @@ Then proceed to attack the first chompy in the queue and remove after chompy die
 
 Reasoning: After a chompie disappears it has a chance to disappear. If you can attack a chompy atleast 1 time (atleast 1 damage done)
 then the compy will remain in the area. Also a chance to get practice with a Data Structure.
+
+- Issue 1: After chompy is first attacked scripts proceeds to click attack on Chompy over and over. 
+- Issue 2: Fill bellows method is very slow. Needs to be redone to take into account total number of bellows at the beginning of script.
+- Issue 3: Check for bow and arrow. Once arrows are depleted, end the script.
+- Issue 4: Implement conditional waiting.
