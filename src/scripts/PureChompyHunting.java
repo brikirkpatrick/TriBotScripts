@@ -22,25 +22,21 @@ import org.tribot.script.interfaces.Painting;
 import static org.tribot.api2007.Walking.clickTileMS;
 
 /**
- * Fix 1: Need to add total number of bellows in players inventory at the beginning.
- * Fix getState 2nd else if statement to include this.
- * Fix 2: Check for correct chompy hunting gear at beginning
- * Fix 3: Add run time + Chompy kills p/hr.
- * DONE 3: Placing new toad where bloated toad already exists
- * https://tribot.org/forums/topic/30185-trilezs-scripting-tutorial/
- * https://pastebin.com/v0Y6vAdy     //ABC2 implement
+ * Kills chompy birds.
+ * Doesn't pluck birds nor does it bank raw chompies.
  */
 
 
 @ScriptManifest(authors = {"Brik94"}, category = "MiniGames", name = "PureChompyHunting",
         description = "Chompy hunting using an efficient method.")
-public class BriChompyHunting extends Script implements Painting, MessageListening07{
+public class PureChompyHunting extends Script implements Painting, MessageListening07{
 
     private final int EMPTY_BELLOWS_ID = 2871, TOAD_ID = 1473, BLOATED_TOAD_ID= 1474, INV_TOAD_ID = 2875,
-                      ALIVE_CHOMY_ID = 1475, SWAMP_ID = 684;
-                        //OGRE_ARROW_ID = 2866, FULL_BELLOWS_ID = 2872,COMP_OGREBOW_ID = 4827, DEAD_CHOMPY_ID = 1476
+                      ALIVE_CHOMY_ID = 1475, SWAMP_ID = 684, FULL_BELLOWS_ID = 2872;
+                        //OGRE_ARROW_ID = 2866, ,COMP_OGREBOW_ID = 4827, DEAD_CHOMPY_ID = 1476
     private final int[] USUSABLE_BELLOW_ID = {2872, 2873, 2874};
-    private int killedChompies;
+    private final int[] ALL_BELLOW_ID = {2871, 2872, 2873, 2874};
+    private int killedChompies, allBellows;
     private State SCRIPT_STATE = getState();
     private ABCUtil abc_util = new ABCUtil(); //AntiBanCompliance
     private final long START_TIME = System.currentTimeMillis();
@@ -61,16 +57,15 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
     }
 
     private enum State {
-        KILLING_CHOMPY, FILLING_BELLOWS, CATCHING_TOAD, PLACING_TOAD, LOOK_FOR_CHOMPY, PLUCKING_CHOMPY
+        KILLING_CHOMPY, FILLING_BELLOWS, CATCHING_TOAD, PLACING_TOAD, PLUCKING_CHOMPY
     }
 
     private State getState(){
         if (checkForChompy()){ //chompy in sight
-            if(numEmptyBellows() == 24){
+            if(numEmptyBellows() == allBellows){
                 println("Less than 1 bellows");
                 return State.FILLING_BELLOWS;
             }else {
-                //Camera.setCameraAngle(General.random(40, 70)); Prolly unnecessary.
                 return State.KILLING_CHOMPY;
             }
         }else if(numEmptyBellows() != 24) {//there is atleast 1 useable bellow
@@ -88,6 +83,7 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
     public void run() {
         Camera.setRotationMethod(Camera.ROTATION_METHOD.ONLY_KEYS);
         killedChompies = 0;
+        allBellows = getTotalBellows();
 
         //noinspection InfiniteLoopStatement
         while(true) {
@@ -100,6 +96,7 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
                     killChompy();
                     break;
                 case FILLING_BELLOWS:
+                    abc();
                     fillBellows();
                     break;
                 case CATCHING_TOAD:
@@ -109,7 +106,7 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
                     placeToad();
                     break;
             }
-            //sleep(40, 80);
+            sleep(40, 80);
         }
     }
 
@@ -145,10 +142,11 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
         return Inventory.getCount(EMPTY_BELLOWS_ID);
     }
 
+    private int getTotalBellows(){ return Inventory.getCount(ALL_BELLOW_ID);}
     private void fillBellows(){
 
         //if all bellows are empty, fill them up.
-        while (numEmptyBellows() != 0){ // returns false
+        while (numEmptyBellows() != 0) { // returns false
             if (Player.getAnimation() == -1) {
                 RSItem[] ebellows = Inventory.find(EMPTY_BELLOWS_ID);
                 RSObject[] bubbles = Objects.findNearest(10, SWAMP_ID);
@@ -156,14 +154,6 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
                 DynamicClicking.clickRSObject(bubbles[0], 1);
                 waitUntilIdle();
             }
-
-//            Timing.waitCondition(new Condition() {
-//                @Override
-//                public boolean active() {
-//                    General.sleep(100);
-//                    return //boolean all bellows full?
-//                }
-//            })
         }
     }
 
@@ -171,11 +161,10 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
         RSItem[] goodBellows = Inventory.find(USUSABLE_BELLOW_ID);
         RSNPC[] toad = NPCs.findNearest(10, TOAD_ID);
         Camera.setCameraAngle(General.random(40, 70));
+        Camera.turnToTile(toad[0].getPosition());
         goodBellows[0].click("Use");
         DynamicClicking.clickRSNPC(toad[0], 1);
         waitUntilIdle();
-
-        //https://tribot.org/forums/topic/60128-tutorial-dynamic-sleepingconditional-sleeping/
     }
 
     private void placeToad(){
@@ -193,8 +182,6 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
         return false;
     }
 
-    //Maybe add conditional Sleeping
-    //https://tribot.org/forums/topic/60128-tutorial-dynamic-sleepingconditional-sleeping/
     private void waitUntilIdle(){
         long t = System.currentTimeMillis();
 
@@ -215,11 +202,20 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
 
     private void killChompy(){
         RSNPC[] first_chompy = NPCs.findNearest(50, ALIVE_CHOMY_ID);
-        if(checkForChompy()){ //if chompy is here
+        if(Player.getRSPlayer().getInteractingCharacter() != null) {
+            //if I'm interacting or killing a chompy then wait.
+            Timing.waitCondition(new Condition() {
+                @Override
+                public boolean active() {
+                    General.sleep(100);
+                    return checkForChompy();
+                }
+            }, General.random(750, 1000));
+        }else{
+            checkForChompy(); //if chompy is here
             //Attack it once. Then check for new chompy. If no new chompy, proceed to attack current chompy.
             first_chompy[0].click("Attack");
             waitUntilIdle();
-            killChompy(); //Recursion. Base case occurs from checkForChompy == false
         }
     }
 
@@ -257,10 +253,10 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
     @Override
     public void serverMessageReceived(String s) {
         sleep(300, 1000);
+        Random rand = new Random();
 
         //Increments killed chompies based on server message received.
         if (s.contains("You scratch a notch on your bow for the chompy bird kill.")) {
-            println("Server message worked. Chompy killed.");
             killedChompies++;
         }
 
@@ -272,7 +268,6 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
             clickTileMS(randomTile, 1);
             Camera.turnToTile(randomTile);
             Camera.setCameraAngle(General.random(40, 70));
-            println("Server message worked. Moved to random tile.");
         }
 
         //Something is wrong, so we move to another tile close by.
@@ -282,7 +277,10 @@ public class BriChompyHunting extends Script implements Painting, MessageListeni
             clickTileMS(randomTile, 1);
             Camera.turnToTile(randomTile);
             Camera.setCameraAngle(General.random(40, 70));
-            println("Server message worked. Moved to random tile.");
+        }
+
+        if (s.contains("Nothing interesting happens")){
+            Camera.setCameraRotation(rand.nextInt(360) + 1);
         }
     }
 
