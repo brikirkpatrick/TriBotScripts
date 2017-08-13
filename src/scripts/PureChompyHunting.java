@@ -27,7 +27,7 @@ import static org.tribot.api2007.Walking.clickTileMS;
  */
 
 
-@ScriptManifest(authors = {"Brik94"}, category = "MiniGames", name = "PureChompyHunting",
+@ScriptManifest(authors = {"Brik94"}, category = "Mini-games", name = "PureChompyHunter",
         description = "Chompy hunting using an efficient method.")
 public class PureChompyHunting extends Script implements Painting, MessageListening07{
 
@@ -63,7 +63,6 @@ public class PureChompyHunting extends Script implements Painting, MessageListen
     private State getState(){
         if (checkForChompy()){ //chompy in sight
             if(numEmptyBellows() == allBellows){
-                println("Less than 1 bellows");
                 return State.FILLING_BELLOWS;
             }else {
                 return State.KILLING_CHOMPY;
@@ -81,6 +80,7 @@ public class PureChompyHunting extends Script implements Painting, MessageListen
 
     @Override
     public void run() {
+        println("Please leave a comment on the forums. All feedback welcome :)");
         Camera.setRotationMethod(Camera.ROTATION_METHOD.ONLY_KEYS);
         killedChompies = 0;
         allBellows = getTotalBellows();
