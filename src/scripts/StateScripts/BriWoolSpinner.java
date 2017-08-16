@@ -1,4 +1,4 @@
-package scripts;
+package scripts.StateScripts;
 
 import org.tribot.api.DynamicClicking;
 import org.tribot.api.General;
