@@ -66,9 +66,8 @@ public class StartGame extends Node {
         Camera.turnToTile(richard[0]);
 
         if (NPCChat.getSelectOptionInterface() == null){
-            if(Player.getAnimation() == -1){
+            if(!richard[0].isOnScreen())
                 Walking.walkTo(richard[0]);
-            }
             richard[0].click("Talk-to");
             Timing.waitCondition(new Condition() {
                 @Override
@@ -103,16 +102,9 @@ public class StartGame extends Node {
 
         //Clicks door.
         if (Player.getPosition() != new RSTile(3056, 4992, 1)) {
-            Timing.waitCondition(new Condition() {
-                @Override
-                public boolean active() {
-                    General.sleep(100);
-                    RSObject[] firstDoor = Objects.findNearest(10, 7256);
-                    DynamicClicking.clickRSObject(firstDoor[0], 1);
-                    waitUntilIdle();
-                    return Player.getPosition() == new RSTile(3056, 4992, 1);
-                }
-            }, General.random(1000, 2000));
+            RSObject[] firstDoor = Objects.findNearest(10, 7256);
+            DynamicClicking.clickRSObject(firstDoor[0], 1);
+            waitUntilIdle();
         }
 
     }
@@ -143,6 +135,7 @@ public class StartGame extends Node {
 
             if(Player.getAnimation() == -1)
                 break;
+
         }
     }
 
