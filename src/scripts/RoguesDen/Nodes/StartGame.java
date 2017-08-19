@@ -17,7 +17,8 @@ import scripts.api.Node;
  * Node used to begin the mini game.
  */
 public class StartGame extends Node {
-    private final RSArea ROGUES_DEN_START = new RSArea(new RSTile(3042, 4966, 1), new RSTile(3061, 4982, 1));
+    //fix start room to contain corridor of 1st door.
+    private final RSArea ROGUES_DEN_START = new RSArea(new RSTile(3042, 4966, 1), new RSTile(3061, 4991, 1));
     private final int RICHARD_ID = 3189, JEWEL_ID = 5561;
     State state;
 
@@ -96,17 +97,18 @@ public class StartGame extends Node {
     }
 
     private void enterDoorway(){
-        RSTile firstDoorTile = new RSTile(3056, 4990, 1);
-        Walking.blindWalkTo(firstDoorTile, null, 0);
+        //RSTile firstDoorTile = new RSTile(3056, 4990, 1);
+        RSArea firsDoorWalkway = new RSArea(new RSTile(3056, 4987, 1), new RSTile(3056, 4991, 1));
+        //Walking.blindWalkTo(firstDoorTile, null, 0);
+        Walking.walkTo(firsDoorWalkway.getRandomTile());
         waitUntilIdle();
 
         //Clicks door.
-        if (Player.getPosition() != new RSTile(3056, 4992, 1)) {
+        if (Player.getPosition()!= new RSTile(3056, 4992, 1)) {
             RSObject[] firstDoor = Objects.findNearest(10, 7256);
             DynamicClicking.clickRSObject(firstDoor[0], 1);
             waitUntilIdle();
         }
-
     }
 
     private void clickThroughChat(){
