@@ -18,13 +18,13 @@ import scripts.api.Node;
  */
 public class StartGame extends Node {
     //fix start room to contain corridor of 1st door.
-    private final RSArea ROGUES_DEN_START = new RSArea(new RSTile(3042, 4966, 1), new RSTile(3061, 4991, 1));
+    private final RSArea ROGUES_DEN_START = new RSArea(new RSTile(3039, 4961, 1), new RSTile(3061, 4991, 1));
     private final int RICHARD_ID = 3189, JEWEL_ID = 5561;
-    State state;
+    private State state;
 
     private enum State{ TALKING_TO_RICHARD, ENTERING_DOORWAY }
 
-    public State getState() {
+    private State getState() {
         if(Inventory.getCount(JEWEL_ID) == 1)
             return State.ENTERING_DOORWAY;
         else return State.TALKING_TO_RICHARD;
@@ -97,16 +97,18 @@ public class StartGame extends Node {
     }
 
     private void enterDoorway(){
-        //RSTile firstDoorTile = new RSTile(3056, 4990, 1);
+        RSTile afterDoorTile = new RSTile(3056, 4992, 1);
         RSArea firsDoorWalkway = new RSArea(new RSTile(3056, 4987, 1), new RSTile(3056, 4991, 1));
         //Walking.blindWalkTo(firstDoorTile, null, 0);
         Walking.walkTo(firsDoorWalkway.getRandomTile());
         waitUntilIdle();
 
         //Clicks door.
-        if (Player.getPosition()!= new RSTile(3056, 4992, 1)) {
+        if (afterDoorTile.isOnScreen() && Player.getPosition()!= afterDoorTile) {
+            General.sleep(400, 800);
             RSObject[] firstDoor = Objects.findNearest(10, 7256);
-            DynamicClicking.clickRSObject(firstDoor[0], 1);
+            if(firstDoor.length > 0)
+                DynamicClicking.clickRSObject(firstDoor[0], 1);
             waitUntilIdle();
         }
     }
@@ -118,6 +120,7 @@ public class StartGame extends Node {
                 NPCChat.selectOption("I want to try the maze again!", true);
             else
                 NPCChat.clickContinue(true);
+            General.sleep(100);
         }
 
     }
