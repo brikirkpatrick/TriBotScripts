@@ -18,8 +18,9 @@ import org.tribot.script.ScriptManifest;
 /**
  * Created by Bri on 8/16/2017.
  * Main Class.
+ * Note: So far script seems to use about 25% CPU Power.
  */
-@ScriptManifest(authors = {"PureImagination"}, category = "Mini-games", name = "PureRogueDenRunner",
+@ScriptManifest(authors = {"PureImagination"}, category = "Mini games", name = "PureRogueDenRunner",
         description = "Rogues Den Mini Game Runner.")
 
 public class PureRogueDenRunner extends Script implements Painting{
@@ -37,7 +38,7 @@ public class PureRogueDenRunner extends Script implements Painting{
 
     @Override
     public void run() {
-        Collections.addAll(nodes, new StartGame(), new Part1());
+        Collections.addAll(nodes, new StartGame(), new Part1(), new Part2());
         loop(20, 40);
 
     }
