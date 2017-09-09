@@ -1,14 +1,12 @@
-#Further Features
-1. BriChompyHunting
+# TriBotScripts
+Scripts I've written for Tribot
 
-- Ideas: To make chompy killing more efficient
-Implement a queue. After I attack chompy for atleast 1 damage add chompy to queue, and attack other chompies until no more chompies appear.
-Then proceed to attack the first chompy in the queue and remove after chompy dies.
+1. PureChompyHunter (Complete)
+- Work on CPU Efficiency (sleeps)
+- Collect Feathers option. Collect raw chompy option > Different script need to add banking and pathing.
+- Check if proper chompy hunting gear is equipped.
+- Eventually create a nice Paint/GUI
 
-Reasoning: After a chompie disappears it has a chance to disappear. If you can attack a chompy atleast 1 time (atleast 1 damage done)
-then the compy will remain in the area. Also a chance to get practice with a Data Structure.
-
-- Issue 1: After chompy is first attacked scripts proceeds to click attack on Chompy over and over. 
-- Issue 2: Fill bellows method is very slow. Needs to be redone to take into account total number of bellows at the beginning of script.
-- Issue 3: Check for bow and arrow. Once arrows are depleted, end the script.
-- Issue 4: Implement conditional waiting.
+2. Rogues Den Runner
+- 3 Parts: #1 complete, #2 80% complete.
+- Eventually create a nice Paint/GUI
