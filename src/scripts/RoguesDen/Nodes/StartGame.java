@@ -15,6 +15,8 @@ import scripts.api.Node;
 /**
  * Created by Bri on 8/16/2017.
  * Node used to begin the mini game.
+ *
+ * Idea: If in an unfamilar Area, restart game by teleporting out with jewel.
  */
 public class StartGame extends Node {
     //fix start room to contain corridor of 1st door.
@@ -25,9 +27,11 @@ public class StartGame extends Node {
     private enum State{ TALKING_TO_RICHARD, ENTERING_DOORWAY }
 
     private State getState() {
-        if(Inventory.getCount(JEWEL_ID) == 1)
+        RSTile myPos = Player.getPosition();
+        if((ROGUES_DEN_START.contains(myPos)))
             return State.ENTERING_DOORWAY;
-        else return State.TALKING_TO_RICHARD;
+        else
+            return null;
     }
 
 
@@ -37,9 +41,6 @@ public class StartGame extends Node {
         switch (this.state){
             case ENTERING_DOORWAY:
                 enterDoorway();
-                break;
-            case TALKING_TO_RICHARD:
-                talkToRichard();
                 break;
             default: break;
         }
@@ -62,6 +63,9 @@ public class StartGame extends Node {
         return state != null ? state.toString() : "";
     }
 
+    /*
+        Deprecated. Due to a recent update, talking to Richard is no longer necessary.
+     */
     private boolean talkToRichard(){
         RSNPC[] richard = NPCs.findNearest(50, RICHARD_ID);
         Camera.turnToTile(richard[0]);
@@ -96,12 +100,10 @@ public class StartGame extends Node {
         return (Inventory.getCount(JEWEL_ID) == 1);
     }
 
-    private void enterDoorway(){
+    private boolean enterDoorway(){
         RSTile afterDoorTile = new RSTile(3056, 4992, 1);
         RSArea firsDoorWalkway = new RSArea(new RSTile(3056, 4987, 1), new RSTile(3056, 4991, 1));
         //Walking.blindWalkTo(firstDoorTile, null, 0);
-        Walking.walkTo(firsDoorWalkway.getRandomTile());
-        waitUntilIdle();
 
         //Clicks door.
         if (afterDoorTile.isOnScreen() && Player.getPosition()!= afterDoorTile) {
@@ -110,7 +112,11 @@ public class StartGame extends Node {
             if(firstDoor.length > 0)
                 DynamicClicking.clickRSObject(firstDoor[0], 1);
             waitUntilIdle();
+        }else{
+            Walking.walkTo(firsDoorWalkway.getRandomTile());
+            waitUntilIdle();
         }
+        return (Inventory.getCount(JEWEL_ID) == 1);
     }
 
     private void clickThroughChat(){
