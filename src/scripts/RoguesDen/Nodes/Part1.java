@@ -28,7 +28,7 @@ public class Part1 extends Node {
         //Polygon of E-Room
         private final RSTile[] otherE = new RSTile[]{new RSTile(2990, 5008, 1), new RSTile(2988, 4999, 1), new RSTile(2976, 5000, 1), new RSTile(2970, 5016, 1), new RSTile(2970, 5018, 1), new RSTile(2978, 5019, 1)};
     private final RSArea ERoom = new RSArea(otherE);
-        private final RSTile[] otherF = new RSTile[]{new RSTile(2968, 5016, 1), new RSTile(2968, 5019, 1), new RSTile(2965, 5025, 1), new RSTile(2953, 5025, 1)};
+        private final RSTile[] otherF = new RSTile[]{new RSTile(2968, 5016, 1), new RSTile(2968, 5019, 1), new RSTile(2965, 5025, 1), new RSTile(2953, 5025, 1),  new RSTile(2967, 5016, 1)};
     private final RSArea FRoom = new RSArea(otherF);
 
 
@@ -155,7 +155,8 @@ public class Part1 extends Node {
                 Walking.clickTileMM(tile5, 1); //area before Ledge.
             waitUntilIdle();
             Walking.clickTileMM(tile3, 1);
-
+            waitUntilIdle();
+            General.sleep(400, 800);
         }
     }
 
@@ -186,6 +187,7 @@ public class Part1 extends Node {
             waitUntilIdle();
             Walking.clickTileMS(pendulum.getRandomTile(), 1);
             waitUntilIdle();
+            General.sleep(400, 800);
             Walking.clickTileMS(new RSTile(2958, 5029, 1), 1);  //TEST. Tile before Part 2 Ledge
         }
         //Cross Blade
@@ -195,7 +197,7 @@ public class Part1 extends Node {
             waitUntilIdle();
             Walking.clickTileMS(blades.getRandomTile(), 1);
             waitUntilIdle();
-            waitUntilIdle();
+
         }
 
     }
