@@ -8,3 +8,4 @@ Scripts I've written for Tribot
 - Eventually create a nice Paint/GUI
 
 2. Rogues Den Runner
+Note: instead of continually creating myPos variable, create a method that will return my current position for efficiency.
